@@ -6,6 +6,7 @@ import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Service
 import ru.edkw.azalia.domain.Category
 import ru.edkw.azalia.repo.CategoryRepo
+import java.util.logging.Logger
 
 private const val ROOT_ID = "0"
 
@@ -22,9 +23,26 @@ class CategoryService(
 
     @CacheEvict("categories")
     fun loadCategories(): Boolean {
-        categoryRepo.deleteAll()
-        saveCategory(ROOT_ID)
-        return true
+        ProductService.LOG.info("loadCategories - started")
+        return if (isApiAvailable()) {
+            categoryRepo.deleteAll()
+            saveCategory(ROOT_ID)
+            ProductService.LOG.info("loadCategories - all categories saved")
+            true
+        } else {
+            false
+        }
+    }
+
+    private fun isApiAvailable(): Boolean {
+        return try {
+            httpService.getCategory(ROOT_ID)
+            LOG.info("isApiAvailable = true")
+            true
+        } catch (e: Exception) {
+            LOG.info("isApiAvailable = false")
+            false
+        }
     }
 
     private fun saveCategory(categoryId: String) {
@@ -33,5 +51,9 @@ class CategoryService(
         }
         categoryRepo.save(category)
         category.childId.forEach(::saveCategory)
+    }
+
+    companion object {
+        val LOG: Logger = Logger.getLogger(this::class.java.name)
     }
 }
