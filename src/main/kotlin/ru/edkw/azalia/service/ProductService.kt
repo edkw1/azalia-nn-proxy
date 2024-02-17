@@ -1,5 +1,7 @@
 package ru.edkw.azalia.service
 
+import org.springframework.cache.annotation.CacheEvict
+import org.springframework.cache.annotation.Cacheable
 import org.springframework.stereotype.Service
 import ru.edkw.azalia.domain.Product
 import ru.edkw.azalia.repo.CategoryRepo
@@ -12,6 +14,7 @@ class ProductService(
     private val httpService: HttpService
 ) {
 
+    @Cacheable("products")
     fun getProducts(vararg categoryId: String): List<Product> {
         val categories = categoryRepo.findAllById(categoryId.toList())
         val products = productRepo.findAllByCategoryIdIn(categories.map { it.id })
@@ -22,6 +25,7 @@ class ProductService(
         }
     }
 
+    @CacheEvict("products")
     fun loadProducts(): Boolean {
         val categoriesIds = categoryRepo.findCategoriesIds()
         categoriesIds.forEach(::saveProducts)

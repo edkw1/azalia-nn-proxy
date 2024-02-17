@@ -1,5 +1,7 @@
 package ru.edkw.azalia.service
 
+import org.springframework.cache.annotation.CacheEvict
+import org.springframework.cache.annotation.Cacheable
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Service
 import ru.edkw.azalia.domain.Category
@@ -13,10 +15,12 @@ class CategoryService(
     private val httpService: HttpService
 ) {
 
+    @Cacheable("categories")
     fun getCategory(categoryId: String?): Category? {
         return categoryRepo.findByIdOrNull(categoryId)
     }
 
+    @CacheEvict("categories")
     fun loadCategories(): Boolean {
         categoryRepo.deleteAll()
         saveCategory(ROOT_ID)

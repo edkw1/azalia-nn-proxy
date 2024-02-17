@@ -7,7 +7,7 @@ import org.apache.http.util.EntityUtils
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.stereotype.Service
 import ru.edkw.azalia.domain.Category
-import ru.edkw.azalia.domain.ProductsData
+import ru.edkw.azalia.dto.ProductsData
 
 @Service
 class HttpService(
