@@ -40,7 +40,9 @@ class ProductService(
     }
 
     private fun saveProducts(categoryId: String) {
-        val products = httpService.getProducts(categoryId).data
+        val products = httpService.getProducts(categoryId).data.map {
+            it.copy(categoryId = categoryId)
+        }
         productRepo.saveAll(products)
     }
 
